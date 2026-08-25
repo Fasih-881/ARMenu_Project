@@ -1,33 +1,44 @@
-import mongoose from 'mongoose';
-import Menu from '../model/menu.model.js';
-
+import Menu from "../model/menu.model.js";
 
 export const addmenu = async (req, res) => {
-    const name = "Chicken Duck";
-    const price = 1000;
-    const isAvailable = true;
-    const URLmodel = "../ARModels/chicken_duck.glb";
-    const add = await Menu.create({
-        name :name,
-       price : price,
-        isAvailable : isAvailable,
-        URLmodel : URLmodel
+  try {
+    const { name, price, URLmodel } = req.body;
+
+    const newmenu = await Menu.create({
+      name,
+      price,
+      URLmodel,
     });
 
-        return res.status(200).json({message: "Menu added successfully"});
-    }
+    return res.status(201).json({
+      success: true,
+      message: "Menu added successfully",
+      newmenu,
+    });
+  } catch (error) {
+    console.log(error.message);
 
-    export const getmenu = async (req,res) => {
-        const fullmenu = await Menu.find();
-        if(fullmenu){
-            return res.status(200).json({
-                success : true,
-                message : "-------Full Menu-------",
-                fullmenu
-            });
-            return res.status(400).json({
-                success : false,
-                message : "Menu not found"
-            });
-        }
-    }
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getmenu = async (req, res) => {
+  try {
+    const fullmenu = await Menu.find();
+
+    return res.status(200).json({
+      success: true,
+      fullmenu,
+    });
+  } catch (error) {
+    console.log(error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

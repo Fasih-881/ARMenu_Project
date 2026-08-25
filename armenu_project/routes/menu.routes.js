@@ -1,10 +1,14 @@
-import mongoose from 'mongoose'
-import express from 'express'
-import { addmenu,getmenu } from '../controllers/menu.controllers.js'
+import express from "express";
 
-const route = express.Router();
+import {
+  addmenu,
+  getmenu,
+} from "../controllers/menu.controllers.js";
 
-route.get('/add', addmenu);
-route.get('/get', getmenu);
+const router = express.Router();
 
-export default route;
+router.post("/add", addmenu);
+
+router.get("/get", getmenu);
+
+export default router;
