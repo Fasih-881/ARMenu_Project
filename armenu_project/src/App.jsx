@@ -5,503 +5,411 @@ import QRCode from "qrcode";
 
 import "./App.css";
 
-
 function App() {
-
   const [menu, setMenu] = useState([]);
-
   const [selectedModel, setSelectedModel] = useState(null);
-
   const [qrCodeURL, setQrCodeURL] = useState("");
 
   const [showAdmin, setShowAdmin] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState("");
 
   const [name, setName] = useState("");
-
   const [price, setPrice] = useState("");
-
+  const [category, setCategory] = useState("Food");
   const [URLmodel, setURLmodel] = useState("");
 
-
-  // Mobile se website open karne ka URL
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [search, setSearch] = useState("");
 
   const websiteURL = "http://192.168.18.238:5173";
 
-
-  // Backend se menu data lana
-
   const getMenu = () => {
-
     fetch("http://192.168.18.238:3000/get")
-
       .then((response) => response.json())
-
       .then((data) => {
-
         setMenu(data.fullmenu || []);
-
       })
-
       .catch((error) => {
-
         console.log("Menu error:", error);
-
       });
-
   };
 
-
   useEffect(() => {
-
     getMenu();
-
   }, []);
-
-
-  // QR Code generate karna
 
   useEffect(() => {
-
     QRCode.toDataURL(websiteURL)
-
       .then((url) => {
-
         setQrCodeURL(url);
-
       })
-
       .catch((error) => {
-
         console.log("QR Error:", error);
-
       });
-
   }, []);
-
-
-  // Selected 3D model set karna
 
   const viewAR = (modelURL) => {
-
     setSelectedModel(modelURL);
-
   };
 
+  const handleAdminClick = () => {
+    setShowAdmin(!showAdmin);
+    setAdminError("");
+  };
 
-  // Admin Panel se MongoDB mein data add karna
-
-  const addMenu = async (e) => {
-
+  const handleAdminLogin = (e) => {
     e.preventDefault();
 
+    if (adminPassword === "admin123") {
+      setIsAdminLoggedIn(true);
+      setAdminPassword("");
+      setAdminError("");
+    } else {
+      setAdminError("Wrong password");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAdminLoggedIn(false);
+    setShowAdmin(false);
+    setAdminPassword("");
+  };
+
+  const addMenu = async (e) => {
+    e.preventDefault();
 
     try {
-
       const response = await fetch(
-
         "http://192.168.18.238:3000/add",
-
         {
-
           method: "POST",
 
-
           headers: {
-
             "Content-Type": "application/json",
-
           },
 
-
           body: JSON.stringify({
-
-            name: name,
-
+            name,
             price: Number(price),
-
-            URLmodel: URLmodel,
-
+            category,
+            URLmodel,
           }),
-
         }
-
       );
 
-
       const data = await response.json();
-
 
       if (data.success) {
-
         alert("Menu added successfully");
 
-
         setName("");
-
         setPrice("");
-
+        setCategory("Food");
         setURLmodel("");
 
-
         getMenu();
-
       } else {
-
         alert(data.message || "Menu add nahi hua");
-
       }
-
     } catch (error) {
-
       console.log("Add menu error:", error);
-
       alert("Something went wrong");
-
     }
-
   };
 
-
-  // Stripe Payment
-
   const handlePayment = async (item) => {
-
     try {
-
       const response = await fetch(
-
         "http://192.168.18.238:3000/create-checkout-session",
-
         {
-
           method: "POST",
 
-
           headers: {
-
             "Content-Type": "application/json",
-
           },
 
-
           body: JSON.stringify({
-
             name: item.name,
-
             price: item.price,
-
             quantity: 1,
-
           }),
-
         }
-
       );
-
 
       const data = await response.json();
 
-
-      console.log("Payment response:", data);
-
-
       if (response.ok && data.url) {
-
         window.location.href = data.url;
-
       } else {
-
         alert(data.message || "Payment failed");
-
       }
-
     } catch (error) {
-
       console.log("Payment error:", error);
-
       alert("Payment failed");
-
     }
-
   };
 
+  // Category + Search dono ke according filter
+  const filteredMenu = menu.filter((item) => {
+    const categoryMatch =
+      selectedCategory === "All" ||
+      item.category === selectedCategory;
+
+    const searchMatch = item.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    return categoryMatch && searchMatch;
+  });
 
   return (
-
     <div className="app">
 
-
       {/* NAVBAR */}
-
       <nav className="navbar">
 
         <div className="logo">
-
-          <span className="logo-icon">
-
-            🍽
-
-          </span>
-
+          <span className="logo-icon">🍽</span>
 
           <div>
-
-            <h1>
-
-              AR MENU
-
-            </h1>
-
+            <h1>AR MENU</h1>
 
             <p>
-
               Experience your food before ordering
-
             </p>
-
           </div>
-
         </div>
 
-
         <button
-
           className="admin-button"
-
-          onClick={() => setShowAdmin(!showAdmin)}
-
+          onClick={handleAdminClick}
         >
-
           {showAdmin ? "Close Admin" : "Admin Panel"}
-
         </button>
 
       </nav>
 
 
       {/* ADMIN PANEL */}
-
       {showAdmin && (
 
         <section className="admin-section">
 
-          <div className="section-title">
+          {!isAdminLoggedIn ? (
 
-            <span>
+            <div className="admin-login-card">
 
-              ADMIN PANEL
+              <div className="section-title">
+                <span>ADMIN ACCESS</span>
 
-            </span>
+                <h2>Admin Login</h2>
 
+                <p>
+                  Enter your password to manage the menu.
+                </p>
+              </div>
 
-            <h2>
+              <form onSubmit={handleAdminLogin}>
 
-              Add a New Menu Item
+                <div className="input-group">
+                  <label>Password</label>
 
-            </h2>
+                  <input
+                    type="password"
+                    placeholder="Enter admin password"
+                    value={adminPassword}
+                    onChange={(e) =>
+                      setAdminPassword(e.target.value)
+                    }
+                    required
+                  />
+                </div>
 
+                {adminError && (
+                  <p className="admin-error">
+                    {adminError}
+                  </p>
+                )}
 
-            <p>
+                <button
+                  type="submit"
+                  className="add-button"
+                >
+                  Login
+                </button>
 
-              Add your food details and Cloudinary 3D model link.
+              </form>
 
-            </p>
+            </div>
 
-          </div>
+          ) : (
 
+            <>
 
-          <div className="admin-card">
+              <div className="admin-top">
 
-            <form onSubmit={addMenu}>
+                <div className="section-title">
+                  <span>ADMIN PANEL</span>
 
+                  <h2>
+                    Add a New Menu Item
+                  </h2>
 
-              <div className="input-group">
+                  <p>
+                    Add your food details and Cloudinary 3D model link.
+                  </p>
+                </div>
 
-                <label>
-
-                  Food Name
-
-                </label>
-
-
-                <input
-
-                  type="text"
-
-                  placeholder="e.g. Chicken Burger"
-
-                  value={name}
-
-                  onChange={(e) => setName(e.target.value)}
-
-                  required
-
-                />
+                <button
+                  className="logout-button"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
 
               </div>
 
 
-              <div className="input-group">
+              <div className="admin-card">
 
-                <label>
+                <form onSubmit={addMenu}>
 
-                  Price
+                  <div className="input-group">
+                    <label>Item Name</label>
 
-                </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Chicken Burger"
+                      value={name}
+                      onChange={(e) =>
+                        setName(e.target.value)
+                      }
+                      required
+                    />
+                  </div>
 
 
-                <input
+                  <div className="input-group">
+                    <label>Price</label>
 
-                  type="number"
+                    <input
+                      type="number"
+                      placeholder="e.g. 1200"
+                      value={price}
+                      onChange={(e) =>
+                        setPrice(e.target.value)
+                      }
+                      required
+                    />
+                  </div>
 
-                  placeholder="e.g. 1200"
 
-                  value={price}
+                  <div className="input-group">
+                    <label>Category</label>
 
-                  onChange={(e) => setPrice(e.target.value)}
+                    <select
+                      value={category}
+                      onChange={(e) =>
+                        setCategory(e.target.value)
+                      }
+                    >
+                      <option value="Food">
+                        Food
+                      </option>
 
-                  required
+                      <option value="Drinks">
+                        Drinks
+                      </option>
 
-                />
+                      <option value="Desserts">
+                        Desserts
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <div className="input-group">
+                    <label>Availability</label>
+
+                    <input
+                      type="text"
+                      value="Available"
+                      disabled
+                    />
+                  </div>
+
+
+                  <div className="input-group full-width">
+                    <label>3D Model URL</label>
+
+                    <input
+                      type="text"
+                      placeholder="Paste Cloudinary .glb URL"
+                      value={URLmodel}
+                      onChange={(e) =>
+                        setURLmodel(e.target.value)
+                      }
+                      required
+                    />
+                  </div>
+
+
+                  <button
+                    type="submit"
+                    className="add-button"
+                  >
+                    Add Menu Item
+                  </button>
+
+                </form>
 
               </div>
 
+            </>
 
-              <div className="input-group full-width">
-
-                <label>
-
-                  3D Model URL
-
-                </label>
-
-
-                <input
-
-                  type="text"
-
-                  placeholder="Paste your Cloudinary .glb URL here"
-
-                  value={URLmodel}
-
-                  onChange={(e) => setURLmodel(e.target.value)}
-
-                  required
-
-                />
-
-              </div>
-
-
-              <button
-
-                type="submit"
-
-                className="add-button"
-
-              >
-
-                Add Menu Item
-
-              </button>
-
-
-            </form>
-
-          </div>
+          )}
 
         </section>
 
       )}
 
 
-      {/* HERO SECTION */}
-
+      {/* HERO */}
       <section className="hero">
 
         <div className="hero-content">
 
           <span className="hero-tag">
-
             INTERACTIVE DINING EXPERIENCE
-
           </span>
 
-
           <h2>
-
             Explore Your Food
-
-            <span>
-
-              {" "}Before You Order.
-
-            </span>
-
+            <span> Before You Order.</span>
           </h2>
 
-
           <p>
-
             View realistic 3D food models and place them
             directly into your space using Augmented Reality.
-
           </p>
-
 
           <div className="hero-stats">
 
             <div>
-
-              <strong>
-
-                {menu.length}
-
-              </strong>
-
-
-              <span>
-
-                Menu Items
-
-              </span>
-
+              <strong>{menu.length}</strong>
+              <span>Menu Items</span>
             </div>
 
-
             <div>
-
-              <strong>
-
-                3D
-
-              </strong>
-
-
-              <span>
-
-                Interactive Models
-
-              </span>
-
+              <strong>3D</strong>
+              <span>Interactive Models</span>
             </div>
 
-
             <div>
-
-              <strong>
-
-                AR
-
-              </strong>
-
-
-              <span>
-
-                Real World View
-
-              </span>
-
+              <strong>AR</strong>
+              <span>Real World View</span>
             </div>
 
           </div>
@@ -510,57 +418,35 @@ function App() {
 
 
         {/* QR CODE */}
-
         {qrCodeURL && (
 
           <div className="qr-card">
 
             <div className="qr-header">
 
-              <span className="qr-icon">
-
-                📱
-
-              </span>
-
+              <span className="qr-icon">📱</span>
 
               <div>
-
-                <h3>
-
-                  Open on Mobile
-
-                </h3>
-
+                <h3>Open on Mobile</h3>
 
                 <p>
-
                   Scan to experience AR
-
                 </p>
-
               </div>
 
             </div>
 
-
             <div className="qr-image">
 
               <img
-
                 src={qrCodeURL}
-
                 alt="AR Menu QR Code"
-
               />
 
             </div>
 
-
             <span className="qr-footer">
-
               Scan with your phone camera
-
             </span>
 
           </div>
@@ -571,57 +457,80 @@ function App() {
 
 
       {/* MENU */}
-
       <section className="menu-section">
 
         <div className="menu-heading">
 
           <div>
-
             <span className="section-label">
-
               OUR DIGITAL MENU
-
             </span>
 
-
             <h2>
-
               Choose Your Experience
-
             </h2>
-
           </div>
 
-
           <p>
-
             Select any item to explore it in 3D,
             view it in AR, or proceed to payment.
-
           </p>
+
+        </div>
+
+
+        {/* SEARCH BAR */}
+        <div className="search-container">
+
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search food or drinks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+        </div>
+
+
+        {/* CATEGORY FILTERS */}
+        <div className="category-filters">
+
+          {["All", "Food", "Drinks", "Desserts"].map(
+            (itemCategory) => (
+
+              <button
+                key={itemCategory}
+                className={
+                  selectedCategory === itemCategory
+                    ? "category-button active-category"
+                    : "category-button"
+                }
+                onClick={() =>
+                  setSelectedCategory(itemCategory)
+                }
+              >
+                {itemCategory}
+              </button>
+
+            )
+          )}
 
         </div>
 
 
         <div className="menu-container">
 
-
-          {menu.length === 0 && (
+          {filteredMenu.length === 0 && (
 
             <div className="empty-menu">
 
               <h3>
-
-                No menu items yet
-
+                No items found
               </h3>
 
-
               <p>
-
-                Open the Admin Panel and add your first item.
-
+                Try another category or search for something else.
               </p>
 
             </div>
@@ -629,86 +538,57 @@ function App() {
           )}
 
 
-          {menu.map((item, index) => (
+          {filteredMenu.map((item, index) => (
 
             <div
-
               key={item._id}
-
               className="menu-card"
-
             >
 
               <div className="card-number">
-
                 {String(index + 1).padStart(2, "0")}
-
               </div>
-
 
               <div className="card-content">
 
                 <span className="item-label">
-
-                  AVAILABLE NOW
-
+                  {item.category || "Food"}
                 </span>
 
-
                 <h2>
-
                   {item.name}
-
                 </h2>
 
-
                 <p className="price">
-
                   Rs. {item.price}
-
                 </p>
 
               </div>
 
 
-              {/* VIEW AR */}
-
               <button
-
                 className="ar-view-button"
-
-                onClick={() => viewAR(item.URLmodel)}
-
+                onClick={() =>
+                  viewAR(item.URLmodel)
+                }
               >
 
-                <span>
-
-                  View in AR
-
-                </span>
-
+                <span>View in AR</span>
 
                 <span className="arrow">
-
                   →
-
                 </span>
 
               </button>
 
 
-              {/* PAY NOW */}
-
               <button
-
                 className="pay-button"
-
-                onClick={() => handlePayment(item)}
-
+                onClick={() =>
+                  handlePayment(item)
+                }
               >
-
                 Pay Now
-
               </button>
 
             </div>
@@ -720,82 +600,54 @@ function App() {
       </section>
 
 
-      {/* 3D MODEL + AR */}
-
+      {/* AR MODEL */}
       {selectedModel && (
 
         <div className="model-overlay">
 
           <div className="model-modal">
 
-
             <div className="model-header">
 
               <div>
-
                 <span className="section-label">
-
                   AR PREVIEW
-
                 </span>
 
-
                 <h2>
-
                   Explore Your Selection
-
                 </h2>
-
               </div>
 
-
               <button
-
                 className="close-button"
-
-                onClick={() => setSelectedModel(null)}
-
+                onClick={() =>
+                  setSelectedModel(null)
+                }
               >
-
                 ✕
-
               </button>
 
             </div>
 
 
             <model-viewer
-
               src={selectedModel}
-
               camera-controls
-
               auto-rotate
-
               ar
-
               ar-modes="webxr scene-viewer quick-look"
-
               ar-placement="floor"
-
               ar-scale="auto"
-
               shadow-intensity="1"
-
               className="model-viewer"
-
             >
 
               <button
-
                 slot="ar-button"
-
                 className="launch-ar-button"
-
               >
-
                 View in your space 📱
-
               </button>
 
             </model-viewer>
@@ -807,10 +659,8 @@ function App() {
       )}
 
     </div>
-
   );
 }
-
 
 export default App;
 

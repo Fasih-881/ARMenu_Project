@@ -1,12 +1,14 @@
+
 import Menu from "../model/menu.model.js";
 
 export const addmenu = async (req, res) => {
   try {
-    const { name, price, URLmodel } = req.body;
+    const { name, price, category, URLmodel } = req.body;
 
     const newmenu = await Menu.create({
       name,
       price,
+      category,
       URLmodel,
     });
 
@@ -42,3 +44,4 @@ export const getmenu = async (req, res) => {
     });
   }
 };
+
