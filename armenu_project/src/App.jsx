@@ -28,7 +28,7 @@ function App() {
   const websiteURL = window.location.origin;
 
   const getMenu = () => {
-    fetch("/get")
+   fetch("/api/get")
       .then((response) => response.json())
       .then((data) => {
         setMenu(data.fullmenu || []);
