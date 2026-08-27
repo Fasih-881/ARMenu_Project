@@ -1,7 +1,18 @@
 
+import dotenv from "dotenv";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+dotenv.config();
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error(
+    "STRIPE_SECRET_KEY is missing. Check your environment variables."
+  );
+}
+
+const stripe = new Stripe(
+  process.env.STRIPE_SECRET_KEY
+);
 
 export const createCheckoutSession = async (req, res) => {
   try {
@@ -14,40 +25,51 @@ export const createCheckoutSession = async (req, res) => {
       });
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+    const origin =
+      req.headers.origin ||
+      `https://${req.headers.host}`;
 
-      mode: "payment",
+    const session =
+      await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
 
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
+        mode: "payment",
 
-            product_data: {
-              name: name,
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+
+              product_data: {
+                name: name,
+              },
+
+              unit_amount: Math.round(
+                Number(price) * 100
+              ),
             },
 
-            unit_amount: Math.round(Number(price) * 100),
+            quantity: quantity || 1,
           },
+        ],
 
-          quantity: quantity || 1,
-        },
-      ],
+        success_url:
+          `${origin}/?payment=success`,
 
-      success_url:
-        "http://192.168.18.238:5173/?payment=success",
-
-      cancel_url:
-        "http://192.168.18.238:5173/?payment=cancel",
-    });
+        cancel_url:
+          `${origin}/?payment=cancel`,
+      });
 
     return res.status(200).json({
       success: true,
       url: session.url,
     });
+
   } catch (error) {
-    console.log("Stripe Error:", error.message);
+    console.log(
+      "Stripe Error:",
+      error.message
+    );
 
     return res.status(500).json({
       success: false,

@@ -25,10 +25,10 @@ function App() {
 
   const [paymentMessage, setPaymentMessage] = useState("");
 
-  const websiteURL = "http://192.168.18.238:5173";
+  const websiteURL = window.location.origin;
 
   const getMenu = () => {
-    fetch("http://192.168.18.238:3000/get")
+    fetch("/api/get")
       .then((response) => response.json())
       .then((data) => {
         setMenu(data.fullmenu || []);
@@ -107,23 +107,20 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        "http://192.168.18.238:3000/add",
-        {
-          method: "POST",
+      const response = await fetch("/api/add", {
+        method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-          },
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-          body: JSON.stringify({
-            name,
-            price: Number(price),
-            category,
-            URLmodel,
-          }),
-        }
-      );
+        body: JSON.stringify({
+          name,
+          price: Number(price),
+          category,
+          URLmodel,
+        }),
+      });
 
       const data = await response.json();
 
@@ -148,7 +145,7 @@ function App() {
   const handlePayment = async (item) => {
     try {
       const response = await fetch(
-        "http://192.168.18.238:3000/create-checkout-session",
+        "/api/create-checkout-session",
         {
           method: "POST",
 
@@ -589,8 +586,8 @@ function App() {
               camera-controls
               auto-rotate
               auto-rotate-delay="0"
-              min-camera-orbit="auto 20deg auto"
-              max-camera-orbit="auto 80deg auto"
+              min-camera-orbit="-45deg 65deg auto"
+              max-camera-orbit="45deg 110deg auto"
               min-field-of-view="25deg"
               max-field-of-view="45deg"
               ar
