@@ -2,8 +2,16 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/get",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/add",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/create-checkout-session",
+      "destination": "/api/index"
     },
     {
       "source": "/(.*)",
@@ -11,3 +19,4 @@
     }
   ]
 }
+
