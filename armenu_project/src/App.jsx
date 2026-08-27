@@ -23,6 +23,8 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
 
+  const [paymentMessage, setPaymentMessage] = useState("");
+
   const websiteURL = "http://192.168.18.238:5173";
 
   const getMenu = () => {
@@ -48,6 +50,30 @@ function App() {
       .catch((error) => {
         console.log("QR Error:", error);
       });
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("payment") === "success") {
+      setPaymentMessage("success");
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+    }
+
+    if (params.get("payment") === "cancel") {
+      setPaymentMessage("cancel");
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+    }
   }, []);
 
   const viewAR = (modelURL) => {
@@ -143,15 +169,14 @@ function App() {
       if (response.ok && data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.message || "Payment failed");
+        setPaymentMessage("failed");
       }
     } catch (error) {
       console.log("Payment error:", error);
-      alert("Payment failed");
+      setPaymentMessage("failed");
     }
   };
 
-  // Category + Search dono ke according filter
   const filteredMenu = menu.filter((item) => {
     const categoryMatch =
       selectedCategory === "All" ||
@@ -167,18 +192,13 @@ function App() {
   return (
     <div className="app">
 
-      {/* NAVBAR */}
       <nav className="navbar">
-
         <div className="logo">
           <span className="logo-icon">🍽</span>
 
           <div>
             <h1>AR MENU</h1>
-
-            <p>
-              Experience your food before ordering
-            </p>
+            <p>Experience your food before ordering</p>
           </div>
         </div>
 
@@ -188,17 +208,12 @@ function App() {
         >
           {showAdmin ? "Close Admin" : "Admin Panel"}
         </button>
-
       </nav>
 
-
-      {/* ADMIN PANEL */}
       {showAdmin && (
-
         <section className="admin-section">
 
           {!isAdminLoggedIn ? (
-
             <div className="admin-login-card">
 
               <div className="section-title">
@@ -243,19 +258,14 @@ function App() {
               </form>
 
             </div>
-
           ) : (
-
             <>
-
               <div className="admin-top">
 
                 <div className="section-title">
                   <span>ADMIN PANEL</span>
 
-                  <h2>
-                    Add a New Menu Item
-                  </h2>
+                  <h2>Add a New Menu Item</h2>
 
                   <p>
                     Add your food details and Cloudinary 3D model link.
@@ -270,7 +280,6 @@ function App() {
                 </button>
 
               </div>
-
 
               <div className="admin-card">
 
@@ -290,7 +299,6 @@ function App() {
                     />
                   </div>
 
-
                   <div className="input-group">
                     <label>Price</label>
 
@@ -305,7 +313,6 @@ function App() {
                     />
                   </div>
 
-
                   <div className="input-group">
                     <label>Category</label>
 
@@ -315,20 +322,11 @@ function App() {
                         setCategory(e.target.value)
                       }
                     >
-                      <option value="Food">
-                        Food
-                      </option>
-
-                      <option value="Drinks">
-                        Drinks
-                      </option>
-
-                      <option value="Desserts">
-                        Desserts
-                      </option>
+                      <option value="Food">Food</option>
+                      <option value="Drinks">Drinks</option>
+                      <option value="Desserts">Desserts</option>
                     </select>
                   </div>
-
 
                   <div className="input-group">
                     <label>Availability</label>
@@ -339,7 +337,6 @@ function App() {
                       disabled
                     />
                   </div>
-
 
                   <div className="input-group full-width">
                     <label>3D Model URL</label>
@@ -355,7 +352,6 @@ function App() {
                     />
                   </div>
 
-
                   <button
                     type="submit"
                     className="add-button"
@@ -366,17 +362,12 @@ function App() {
                 </form>
 
               </div>
-
             </>
-
           )}
 
         </section>
-
       )}
 
-
-      {/* HERO */}
       <section className="hero">
 
         <div className="hero-content">
@@ -416,10 +407,7 @@ function App() {
 
         </div>
 
-
-        {/* QR CODE */}
         {qrCodeURL && (
-
           <div className="qr-card">
 
             <div className="qr-header">
@@ -428,21 +416,16 @@ function App() {
 
               <div>
                 <h3>Open on Mobile</h3>
-
-                <p>
-                  Scan to experience AR
-                </p>
+                <p>Scan to experience AR</p>
               </div>
 
             </div>
 
             <div className="qr-image">
-
               <img
                 src={qrCodeURL}
                 alt="AR Menu QR Code"
               />
-
             </div>
 
             <span className="qr-footer">
@@ -450,13 +433,10 @@ function App() {
             </span>
 
           </div>
-
         )}
 
       </section>
 
-
-      {/* MENU */}
       <section className="menu-section">
 
         <div className="menu-heading">
@@ -478,8 +458,6 @@ function App() {
 
         </div>
 
-
-        {/* SEARCH BAR */}
         <div className="search-container">
 
           <input
@@ -492,13 +470,10 @@ function App() {
 
         </div>
 
-
-        {/* CATEGORY FILTERS */}
         <div className="category-filters">
 
           {["All", "Food", "Drinks", "Desserts"].map(
             (itemCategory) => (
-
               <button
                 key={itemCategory}
                 className={
@@ -512,34 +487,26 @@ function App() {
               >
                 {itemCategory}
               </button>
-
             )
           )}
 
         </div>
 
-
         <div className="menu-container">
 
           {filteredMenu.length === 0 && (
-
             <div className="empty-menu">
 
-              <h3>
-                No items found
-              </h3>
+              <h3>No items found</h3>
 
               <p>
                 Try another category or search for something else.
               </p>
 
             </div>
-
           )}
 
-
           {filteredMenu.map((item, index) => (
-
             <div
               key={item._id}
               className="menu-card"
@@ -555,9 +522,7 @@ function App() {
                   {item.category || "Food"}
                 </span>
 
-                <h2>
-                  {item.name}
-                </h2>
+                <h2>{item.name}</h2>
 
                 <p className="price">
                   Rs. {item.price}
@@ -565,22 +530,15 @@ function App() {
 
               </div>
 
-
               <button
                 className="ar-view-button"
                 onClick={() =>
                   viewAR(item.URLmodel)
                 }
               >
-
                 <span>View in AR</span>
-
-                <span className="arrow">
-                  →
-                </span>
-
+                <span className="arrow">→</span>
               </button>
-
 
               <button
                 className="pay-button"
@@ -592,17 +550,13 @@ function App() {
               </button>
 
             </div>
-
           ))}
 
         </div>
 
       </section>
 
-
-      {/* AR MODEL */}
       {selectedModel && (
-
         <div className="model-overlay">
 
           <div className="model-modal">
@@ -630,11 +584,15 @@ function App() {
 
             </div>
 
-
             <model-viewer
               src={selectedModel}
               camera-controls
               auto-rotate
+              auto-rotate-delay="0"
+              min-camera-orbit="auto 20deg auto"
+              max-camera-orbit="auto 80deg auto"
+              min-field-of-view="25deg"
+              max-field-of-view="45deg"
               ar
               ar-modes="webxr scene-viewer quick-look"
               ar-placement="floor"
@@ -655,7 +613,71 @@ function App() {
           </div>
 
         </div>
+      )}
 
+      {paymentMessage && (
+        <div className="payment-popup-overlay">
+
+          <div className="payment-popup">
+
+            {paymentMessage === "success" && (
+              <>
+                <div className="payment-popup-icon success-popup">
+                  ✓
+                </div>
+
+                <h2>Payment Successful!</h2>
+
+                <p>
+                  Your payment has been completed successfully.
+                </p>
+
+                <p className="popup-small-text">
+                  Thank you for your order!
+                </p>
+              </>
+            )}
+
+            {paymentMessage === "cancel" && (
+              <>
+                <div className="payment-popup-icon cancel-popup">
+                  ✕
+                </div>
+
+                <h2>Payment Cancelled</h2>
+
+                <p>
+                  Your payment was not completed.
+                </p>
+              </>
+            )}
+
+            {paymentMessage === "failed" && (
+              <>
+                <div className="payment-popup-icon cancel-popup">
+                  ✕
+                </div>
+
+                <h2>Payment Failed</h2>
+
+                <p>
+                  Something went wrong. Please try again.
+                </p>
+              </>
+            )}
+
+            <button
+              className="popup-button"
+              onClick={() =>
+                setPaymentMessage("")
+              }
+            >
+              Continue
+            </button>
+
+          </div>
+
+        </div>
       )}
 
     </div>
