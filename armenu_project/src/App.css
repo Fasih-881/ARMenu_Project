@@ -1197,7 +1197,7 @@ button {
   }
 
 }
-```css
+
 /* ============================= */
 /* PAYMENT POPUP */
 /* ============================= */
@@ -1342,5 +1342,327 @@ button {
     font-size: 26px;
   }
 }
+.delete-button {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+.delete-button:active {
+  transform: translateY(0);
+}
+/* Update Button */
+.update-button {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  
+}
+
+.update-button:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.update-button:active {
+  transform: translateY(0);
+}
+
+/* Update Modal */
+.update-modal {
+  max-width: 600px;
+  width: 90%;
+}
+
+.update-modal form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.update-modal .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.update-modal .input-group:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.update-modal .add-button {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+  .update-modal form {
+    grid-template-columns: 1fr;
+  }
+
+  .update-modal .input-group:nth-child(4),
+  .update-modal .add-button {
+    grid-column: auto;
+  }
+
+  
+}
+/* ================================
+   PROFESSIONAL UPDATE BUTTON
+================================ */
+
+.update-button {
+  background: #f59e0b;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.update-button:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.update-button:active {
+  transform: scale(0.97);
+}
 
 
+/* ================================
+   PROFESSIONAL DELETE BUTTON
+================================ */
+
+.delete-button {
+  background: #e53935;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.delete-button:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+.delete-button:active {
+  transform: scale(0.97);
+}
+
+
+/* ================================
+   UPDATE MODAL
+================================ */
+
+.update-modal {
+  max-width: 600px;
+  width: 90%;
+}
+
+.update-modal form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.update-modal .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.update-modal .input-group:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.update-modal .add-button {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+}
+
+
+/* ================================
+   DELETE POPUP BUTTONS
+================================ */
+
+.popup-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 25px;
+}
+
+.popup-cancel-button,
+.popup-delete-button {
+  border: none;
+  padding: 12px 26px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popup-cancel-button {
+  background: #e5e7eb;
+  color: #333333;
+}
+
+.popup-cancel-button:hover {
+  background: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.popup-delete-button {
+  background: #e53935;
+  color: #ffffff;
+}
+
+.popup-delete-button:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+.popup-cancel-button:active,
+.popup-delete-button:active {
+  transform: scale(0.97);
+}
+
+
+/* ================================
+   POPUP SMOOTH EFFECT
+================================ */
+
+.payment-popup-overlay {
+  animation: popupOverlayIn 0.2s ease;
+}
+
+.payment-popup {
+  animation: popupIn 0.25s ease;
+}
+
+@keyframes popupOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+  .update-modal {
+    width: 92%;
+    max-width: none;
+  }
+
+  .update-modal form {
+    grid-template-columns: 1fr;
+  }
+
+  .update-modal .input-group:nth-child(4),
+  .update-modal .add-button {
+    grid-column: auto;
+  }
+
+  .update-button,
+  .delete-button {
+    margin-left: 5px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .popup-actions {
+    gap: 10px;
+  }
+
+  .popup-cancel-button,
+  .popup-delete-button {
+    padding: 11px 20px;
+  }
+}
+/* Align all menu action buttons equally */
+.menu-card .pay-button,
+.menu-card .update-button,
+.menu-card .delete-button,
+.menu-card .ar-view-button {
+  width: 100%;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+
+/* Keep proper spacing between buttons */
+.menu-card .update-button {
+  margin-top: 10px;
+}
+
+.menu-card .delete-button {
+  margin-top: 10px;
+}
+.product-model {
+  width: 100%;
+  height: 260px;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.product-model model-viewer {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+}

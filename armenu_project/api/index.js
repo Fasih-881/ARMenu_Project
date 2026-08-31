@@ -17,9 +17,9 @@ app.use(express.json());
 
 connectDB();
 
-app.use("/", menuroute);
+app.use("/api", menuroute);
 
-app.use("/", paymentroute);
+app.use("/api", paymentroute);
 
 app.get("/test", (req, res) => {
   res.send("Backend is working");
